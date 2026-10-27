@@ -1,0 +1,18 @@
+# Build & OS artifacts
+.gradle/
+build/
+*/build/
+.idea/
+*.iml
+local.properties
+.DS_Store
+Thumbs.db
+node_modules/
+
+# Android output
+*.apk
+*.aab
+
+# Sensitive files
+google-services.json
+!google-services.json.example

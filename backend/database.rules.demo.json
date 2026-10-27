@@ -1,0 +1,77 @@
+{
+  "rules": {
+    "parcels": {
+      "$parcelId": {
+        ".read": true,
+        ".write": true,
+        "liveState": {
+          ".validate": "newData.hasChildren(['parcelId', 'parcelState', 'shakeLevel', 'connectivity'])",
+          "parcelId": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length < 64"
+          },
+          "parcelState": {
+            ".validate": "newData.val() === 'SECURE' || newData.val() === 'OPENED' || newData.val() === 'UNKNOWN'"
+          },
+          "reedState": {
+            ".validate": "newData.val() === 'OPEN' || newData.val() === 'CLOSED' || newData.val() === 'UNKNOWN'"
+          },
+          "openCount": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "shakeLevel": {
+            ".validate": "newData.val() === 'LOW' || newData.val() === 'MEDIUM' || newData.val() === 'INTENSE'"
+          },
+          "accelerometer": {
+            ".validate": "newData.hasChildren(['ax', 'ay', 'az'])",
+            "ax": { ".validate": "newData.isNumber()" },
+            "ay": { ".validate": "newData.isNumber()" },
+            "az": { ".validate": "newData.isNumber()" }
+          },
+          "location": {
+            "latitude": {
+              ".validate": "newData.isNumber() && newData.val() >= -90.0 && newData.val() <= 90.0"
+            },
+            "longitude": {
+              ".validate": "newData.isNumber() && newData.val() >= -180.0 && newData.val() <= 180.0"
+            },
+            "accuracy": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "source": {
+              ".validate": "newData.val() === 'PHONE_PROXY' || newData.val() === 'HARDWARE_GPS'"
+            }
+          }
+        },
+        "events": {
+          "$eventId": {
+            ".validate": "newData.hasChildren(['eventId', 'eventType', 'severity', 'gatewayTimestamp'])",
+            "eventId": {
+              ".validate": "newData.isString() && newData.val() === $eventId"
+            },
+            "eventType": {
+              ".validate": "newData.val() === 'PARCEL_OPENED' || newData.val() === 'PARCEL_CLOSED' || newData.val() === 'SHAKE_LEVEL_CHANGED' || newData.val() === 'MPU_ERROR' || newData.val() === 'GATEWAY_STATUS'"
+            },
+            "severity": {
+              ".validate": "newData.val() === 'INFO' || newData.val() === 'WARNING' || newData.val() === 'CRITICAL'"
+            },
+            "openCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "shakeLevel": {
+              ".validate": "newData.val() === 'LOW' || newData.val() === 'MEDIUM' || newData.val() === 'INTENSE'"
+            }
+          }
+        },
+        "gatewayHealth": {
+          ".validate": "newData.hasChildren(['gatewayId', 'bluetoothState', 'networkState'])",
+          "bluetoothState": {
+            ".validate": "newData.val() === 'DISCONNECTED' || newData.val() === 'CONNECTING' || newData.val() === 'CONNECTED'"
+          },
+          "networkState": {
+            ".validate": "newData.val() === 'DISCONNECTED' || newData.val() === 'CONNECTED_WIFI' || newData.val() === 'CONNECTED_CELLULAR'"
+          }
+        }
+      }
+    }
+  }
+}

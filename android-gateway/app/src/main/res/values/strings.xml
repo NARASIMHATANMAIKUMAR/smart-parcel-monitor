@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Parcel Gateway</string>
+    <string name="title_parcel_monitor">Smart Parcel Gateway</string>
+    <string name="label_select_hc05">Select HC-05 Device</string>
+    <string name="btn_connect_bt">Connect Bluetooth</string>
+    <string name="btn_disconnect_bt">Disconnect</string>
+    <string name="btn_start_monitoring">Start Monitoring</string>
+    <string name="btn_stop_monitoring">Stop Monitoring</string>
+    <string name="label_location_sharing">Share Phone GPS Proxy</string>
+    <string name="status_bt_disconnected">Bluetooth: Disconnected</string>
+    <string name="status_bt_connecting">Bluetooth: Connecting...</string>
+    <string name="status_bt_connected">Bluetooth: Connected to HC-05</string>
+    <string name="status_sensor_recent">Sensor Data: Streaming (1Hz)</string>
+    <string name="status_net_offline">Internet: Offline (Queueing)</string>
+    <string name="status_net_online">Internet: Connected</string>
+    <string name="status_upload_ok">Cloud: Sync OK</string>
+    <string name="status_gps_denied">GPS: Permission Denied</string>
+    <string name="status_gps_no_fix">GPS: Acquiring Fix...</string>
+    <string name="status_gps_fix">GPS: Proxy Fix Active</string>
+    <string name="label_raw_diagnostics">Firmware Serial Log (USART2 9600 Baud)</string>
+    <string name="label_open_count">Open Count:</string>
+    <string name="label_shake_level">Shock Level:</string>
+    <string name="label_last_upload">Last Upload:</string>
+</resources>

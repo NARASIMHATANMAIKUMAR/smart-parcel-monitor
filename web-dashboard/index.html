@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Smart Parcel Condition & Tamper Monitoring Dashboard</title>
+  <meta name="description" content="Real-time IoT parcel condition, tamper detection, motion shock, and GPS proxy location monitoring system for STM32F401 and Android gateway.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet.js Mapping Library CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Core Dashboard Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- Persistent Simulation Mode Alert Banner -->
+  <aside id="simBanner" class="sim-banner" role="alert">
+    <span class="badge-sim">Simulation Mode</span>
+    <span>⚠️ HARDWARE SIMULATOR ACTIVE — Displaying generated STM32 & GPS proxy telemetry for demonstration.</span>
+  </aside>
+
+  <div class="app-container">
+    
+    <!-- Header Section -->
+    <header class="dashboard-header" role="banner">
+      <div class="brand-section">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Smart Parcel Monitor</h1>
+          <p>IoT Condition, Shock &amp; Tamper Surveillance System</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="parcel-selector-group">
+          <label for="parcelIdInput">Parcel ID</label>
+          <input type="text" id="parcelIdInput" value="PARCEL-001" placeholder="PARCEL-001" spellcheck="false" autocomplete="off" />
+        </div>
+
+        <div id="connectionChip" class="status-chip offline" aria-live="polite">
+          <span class="dot"></span> Disconnected
+        </div>
+
+        <div class="sync-time-wrapper">
+          <span>Synced:</span>
+          <strong id="syncTime" class="sync-val">Never</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid" role="main">
+
+      <!-- 1. Parcel Security Card -->
+      <section class="glass-card col-span-4" aria-labelledby="securityCardTitle">
+        <div class="card-header">
+          <h2 id="securityCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Parcel Security
+          </h2>
+          <span class="metric-label">Reed Switch</span>
+        </div>
+        <div class="security-status-display">
+          <div id="securityBadge" class="security-badge secure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div id="securityStateText" class="security-state-text">SECURE</div>
+        </div>
+        <div class="tamper-metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">Total Openings</div>
+            <div id="openCount" class="metric-value">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Last Opened</div>
+            <div id="lastOpenedTime" class="metric-value" style="font-size: 0.95rem;">None</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Movement & Shock Level Card -->
+      <section class="glass-card col-span-4" aria-labelledby="motionCardTitle">
+        <div class="card-header">
+          <h2 id="motionCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Movement &amp; Shock
+          </h2>
+          <span class="metric-label">MPU6050</span>
+        </div>
+        <div class="shake-indicator-container">
+          <div class="shake-level-bar">
+            <div id="shakeStepLow" class="shake-step active low">LOW</div>
+            <div id="shakeStepMed" class="shake-step">MEDIUM</div>
+            <div id="shakeStepIntense" class="shake-step">INTENSE</div>
+          </div>
+        </div>
+        <div class="tamper-metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">Motion Score</div>
+            <div id="motionScore" class="metric-value">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Last Shock Transition</div>
+            <div id="shakeChangeTime" class="metric-value" style="font-size: 0.95rem;">Stable</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Live Accelerometer Telemetry Card -->
+      <section class="glass-card col-span-4" aria-labelledby="telemetryCardTitle">
+        <div class="card-header">
+          <h2 id="telemetryCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Live IMU Telemetry
+          </h2>
+          <div id="freshnessPill" class="freshness-pill dead">
+            <span id="freshnessText">NO DATA</span>
+          </div>
+        </div>
+        <div class="sensor-readings-grid">
+          <div class="axis-badge">
+            <div class="axis-name">AX (Pitch)</div>
+            <div id="axDisplay" class="axis-raw">0</div>
+            <div class="axis-g">Raw LSB</div>
+          </div>
+          <div class="axis-badge">
+            <div class="axis-name">AY (Roll)</div>
+            <div id="ayDisplay" class="axis-raw">0</div>
+            <div class="axis-g">Raw LSB</div>
+          </div>
+          <div class="axis-badge">
+            <div class="axis-name">AZ (Yaw)</div>
+            <div id="azDisplay" class="axis-raw">16384</div>
+            <div class="axis-g">1.0 g gravity</div>
+          </div>
+        </div>
+        <div class="tamper-metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">IMU Sensor Health</div>
+            <div id="mpuStatus" class="metric-value" style="font-size: 1.1rem; color: #10b981;">OK</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Telemetry Rate</div>
+            <div class="metric-value" style="font-size: 1.1rem;">1.0 Hz</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. GPS Map Section -->
+      <section class="glass-card col-span-8" aria-labelledby="mapCardTitle">
+        <div class="card-header">
+          <h2 id="mapCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Transit Location Map
+          </h2>
+          <span class="proxy-warning-tag" id="locSourceDisplay">Proxy: Android Phone GPS</span>
+        </div>
+        <div class="map-container-wrapper">
+          <div id="parcelMap"></div>
+          <div id="mapStaleOverlay" class="map-stale-overlay">
+            ⚠️ GPS Location Unavailable
+          </div>
+        </div>
+        <div class="map-coords-bar">
+          <div>Coordinates: <strong id="coordsDisplay">12.97160°, 77.59456°</strong></div>
+          <div>Accuracy: <strong id="accuracyDisplay">&plusmn;8.5 m</strong></div>
+          <div>Last Fix: <strong id="locTimeDisplay">--:--:--</strong></div>
+        </div>
+      </section>
+
+      <!-- 5. Event Timeline Section -->
+      <section class="glass-card col-span-4" aria-labelledby="timelineCardTitle">
+        <div class="card-header">
+          <h2 id="timelineCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            Event Timeline
+          </h2>
+          <button id="clearDataBtn" class="btn btn-secondary btn-sm" type="button" title="Clear Demonstration Data">
+            Clear Log
+          </button>
+        </div>
+        <div id="timelineList" class="timeline-list" role="log" aria-live="polite">
+          <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            Awaiting events from gateway...
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. System Health Section -->
+      <section class="glass-card col-span-12" aria-labelledby="healthCardTitle">
+        <div class="card-header">
+          <h2 id="healthCardTitle" class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            System Health &amp; Gateway Telemetry
+          </h2>
+        </div>
+        <div class="health-indicators-grid">
+          <div class="health-item">
+            <span class="health-label">Android Gateway</span>
+            <span id="gwOnlineStatus" class="health-val" style="color: #ef4444;">Offline</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Bluetooth (HC-05)</span>
+            <span id="btConnectedStatus" class="health-val" style="color: #ef4444;">Disconnected</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Cloud Sync</span>
+            <span id="cloudUploadStatus" class="health-val" style="color: #f59e0b;">Standby</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Last Sensor Packet</span>
+            <span id="lastSensorTime" class="health-val">--</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Last GPS Fix</span>
+            <span id="lastGpsTime" class="health-val">--</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Leaflet.js Mapping Library JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Firebase Client SDK (Compat Version for Standalone Browser Support) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Dashboard JavaScript Modules -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/map-service.js"></script>
+  <script src="js/simulator.js"></script>
+  <script src="js/local-sync.js"></script>
+  <script src="js/firebase-service.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

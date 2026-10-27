@@ -1,0 +1,79 @@
+{
+  "parcels": {
+    "PARCEL-001": {
+      "gatewayUid": "DEMO_GATEWAY_UID",
+      "ownerUid": "DEMO_OWNER_UID",
+      "isPublicDemo": true,
+      "liveState": {
+        "parcelId": "PARCEL-001",
+        "gatewayId": "ANDROID-GW-DEMO",
+        "parcelState": "SECURE",
+        "reedState": "CLOSED",
+        "openCount": 0,
+        "lastOpenedTimestamp": null,
+        "shakeLevel": "LOW",
+        "lastShakeChangeTimestamp": 1710000000000,
+        "accelerometer": {
+          "ax": 140,
+          "ay": -280,
+          "az": 16380,
+          "motionScore": 120
+        },
+        "mpuStatus": "OK",
+        "location": {
+          "latitude": 12.971598,
+          "longitude": 77.594562,
+          "accuracy": 7.4,
+          "altitude": 920.0,
+          "speed": 0.0,
+          "timestamp": 1710000000000,
+          "source": "PHONE_PROXY",
+          "isSharingEnabled": true
+        },
+        "connectivity": {
+          "bluetoothConnected": true,
+          "bluetoothDeviceName": "HC-05-PARCEL",
+          "bluetoothDeviceAddress": "98:D3:31:F8:00:1A",
+          "gatewayOnline": true,
+          "gatewayNetworkType": "WIFI",
+          "lastSensorReceivedTimestamp": 1710000000000,
+          "lastCloudUploadTimestamp": 1710000000100
+        },
+        "updatedAt": 1710000000000
+      },
+      "events": {
+        "EVT_1710000000000_INIT": {
+          "eventId": "EVT_1710000000000_INIT",
+          "parcelId": "PARCEL-001",
+          "gatewayId": "ANDROID-GW-DEMO",
+          "eventType": "GATEWAY_STATUS",
+          "description": "Gateway initialized and connected to STM32 monitor via Bluetooth.",
+          "severity": "INFO",
+          "openCount": 0,
+          "shakeLevel": "LOW",
+          "location": {
+            "latitude": 12.971598,
+            "longitude": 77.594562,
+            "accuracy": 7.4,
+            "timestamp": 1710000000000,
+            "source": "PHONE_PROXY"
+          },
+          "gatewayTimestamp": 1710000000000,
+          "serverTimestamp": 1710000000050
+        }
+      },
+      "gatewayHealth": {
+        "gatewayId": "ANDROID-GW-DEMO",
+        "parcelId": "PARCEL-001",
+        "appVersion": "1.0.0",
+        "batteryPercent": 92,
+        "isCharging": false,
+        "bluetoothState": "CONNECTED",
+        "networkState": "CONNECTED_WIFI",
+        "gpsState": "FIX_ACQUIRED",
+        "activeMonitoring": true,
+        "lastHeartbeat": 1710000000000
+      }
+    }
+  }
+}
